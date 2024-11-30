@@ -113,12 +113,13 @@ def updateBar1(contents, filename, target, choice):
 )
 def updateBar2(contents, filename, target):
     df = parseDf(filename, contents)
-    
-    df = preprocess(df)
-    res = df.corr()[target]
+    numCols = df.select_dtypes(include='number')
 
-    fig = px.bar(df, x=df.columns, y=res, title=f"Correlation Strength of Numerical Variables with {target}", text=target)
-    fig.update_layout(yaxis_title=f"{target} (average)")
+    res = numCols.corr()[target].abs()
+    res = res.drop(target)
+
+    fig = px.bar(res, x=res.index, y=res.values, title=f"Correlation Strength of Numerical Variables with {target}", text=target)
+    fig.update_layout(xaxis_title="Numerical Variables", yaxis_title=f"Correlation Strength (absolute value)")
     return fig
 
 # @app.callback(
@@ -127,6 +128,7 @@ def updateBar2(contents, filename, target):
 # )
 # def regression(filename, contents, targetVar):
 #     df = parseDf(filename, contents)
+#     df = preprocess(df)
 #     gradBoostRegr(df, targetVar)
     
 

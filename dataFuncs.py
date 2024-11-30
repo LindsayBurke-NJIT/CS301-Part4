@@ -14,39 +14,15 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 
 def preprocess(df):
-    #Do label encoding for the low medium and high variables
-    lowMedHighVars = ["Parental_Involvement", "Access_to_Resources", "Motivation_Level", "Family_Income", "Teacher_Quality"]
-    labels={'Low': 1, 'Medium': 2, 'High': 3}
-    for cat in range(len(lowMedHighVars)):
-        df[lowMedHighVars[cat]]=df[lowMedHighVars[cat]].map(labels)
-
-    #Do One-Hot Encoding (drop the first) for Yes/No variables
-    df = pd.get_dummies(df,columns=['Extracurricular_Activities'],drop_first=True)
-    df = pd.get_dummies(df,columns=['Internet_Access'],drop_first=True)
-    df = pd.get_dummies(df,columns=['Learning_Disabilities'],drop_first=True)
-
-    #Do label encoding for positive, negative, neutral Peer_Influence
-    labels={'Positive': 1, 'Negative': -1, 'Neutral': 0}
-    df["Peer_Influence"] = df["Peer_Influence"].map(labels)
-
-    #Do One-Hot encoding for School_Type_Public (public -> 1, private -> 0)
-    df = pd.get_dummies(df,columns=['School_Type'],drop_first=True)
-
-    #Do One-Hot encoding for Gender_Male (Male -> 1, Female -> 0)
-    df = pd.get_dummies(df,columns=['Gender'],drop_first=True)
-
-    #Do label encoding for distance_from_home
-    labels={'Near': 1, 'Moderate': 2, 'Far': 3}
-    df["Distance_from_Home"] = df["Distance_from_Home"].map(labels)
-
-    #Do label encoding for Parent_Education_Level
-    labels={'High School': 1, 'College': 2, 'Postgraduate': 3}
-    df["Parental_Education_Level"] = df["Parental_Education_Level"].map(labels)
-
-    df["Parental_Education_Level"] = df["Parental_Education_Level"].fillna(df["Parental_Education_Level"].mode()[0])
-    df["Teacher_Quality"] = df["Teacher_Quality"].fillna(df["Teacher_Quality"].mode()[0])
-    df["Distance_from_Home"] = df["Distance_from_Home"].fillna(df["Distance_from_Home"].mode()[0])
+    df = pd.get_dummies(df,drop_first=True)
     
+    for col in df.select_dtypes(include='object').columns:
+        mode_value = df[col].mode()[0]
+        df[col].fillna(mode_value, inplace=True)
+    
+    for col in df.select_dtypes(include='number').columns:
+        median_value = df[col].median()
+        df[col].fillna(median_value, inplace=True)
     return df
 
 def parseDf(filename, contents):
