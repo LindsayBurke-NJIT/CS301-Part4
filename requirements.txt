@@ -2,6 +2,4 @@ dash==2.0.0
 pandas
 gunicorn
 plotly
-sklearn
-base64
-io
+scikit-learn
