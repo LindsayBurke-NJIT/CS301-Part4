@@ -150,6 +150,7 @@ def setDropdownOpts(filename, contents):
 )
 def setRadioOpts(filename, contents, target):
     df = parseDf(filename, contents)
+    df = preprocess(df)
 
     df = df.drop(columns=target)
     df = df.select_dtypes(exclude='number')
@@ -163,6 +164,7 @@ def setRadioOpts(filename, contents, target):
 )
 def updateBar1(contents, filename, target, choice):
     df = parseDf(filename, contents)
+    df = preprocess(df)
 
     res = df.groupby(choice)[target].mean().reset_index()
 
@@ -176,6 +178,7 @@ def updateBar1(contents, filename, target, choice):
 )
 def updateBar2(contents, filename, target):
     df = parseDf(filename, contents)
+    df = preprocess(df)
     numCols = df.select_dtypes(include='number')
 
     res = numCols.corr()[target].abs()
@@ -191,6 +194,7 @@ def updateBar2(contents, filename, target):
 )
 def setCheckListRegr(contents, filename, targetVar):
     df = parseDf(filename, contents)
+    df = preprocess(df)
     df = df.drop(columns=targetVar)
 
     return df.columns, df.columns
