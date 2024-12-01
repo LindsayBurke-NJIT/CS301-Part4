@@ -103,7 +103,8 @@ app.layout = html.Div(children=[
                 "marginLeft": "25vw",
                 "marginRight": "0px",
                 "width": "50%"
-            }
+            },
+            value = ""
         ),
         html.Button(
             "Predict",
@@ -241,9 +242,9 @@ def setPredict(n_clicks, contents, fname, predictVals, target, checklistVals):
         predArr = []
         predArr.append(predictVals)
         predictData = pd.DataFrame(predArr, columns=checklistVals)
-    pipe = getPipeline(df[checklistVals], df[target])
+    pipe, _, _ = getPipeline(df[checklistVals], df[target])
     y_pred = pipe.predict(predictData)
-    return [f"Predicted {target} is: {y_pred}"]
+    return [f"Predicted {target} is: {y_pred[0]}"]
 
 if __name__ == '__main__':
     app.run_server(debug=True)
