@@ -4,10 +4,6 @@ from dash.dependencies import Input, Output, State
 import plotly.express as px
 from dataFuncs import *
 
-url = "https://drive.google.com/file/d/1GiZL0hZa9pVuYSMnwJVWrtas_ESnNXif/view?usp=sharing"
-path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
-df = pd.read_csv(path)
-
 app = Dash(__name__)
 server = app.server
 
@@ -202,11 +198,12 @@ def setCheckListRegr(contents, filename, targetVar):
 @app.callback(
     [Output('r2-output', 'children'), Output('inputPrediction', 'placeholder')],
     [Input('start-train', 'n_clicks')],
-    [State('checklist-regr', 'value'), State('dropdown-target', 'value')]
+    [State('upload-data', 'contents'), State('upload-data', 'filename'), State('checklist-regr', 'value'), State('dropdown-target', 'value')]
 )
-def setR2(n_clicks, checklistVal, target):
+def setR2(n_clicks, contents, filename, checklistVal, target):
     if(n_clicks==0):
         return [""]
+    df = parseDf(filename, contents)
     r2 = gradBoostRegr(df, target, checklistVal)
 
     placeholderStr = ""
