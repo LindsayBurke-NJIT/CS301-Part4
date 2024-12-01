@@ -1,6 +1,6 @@
 import pandas as pd
 from dash import Dash, dcc, html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import plotly.express as px
 from dataFuncs import *
 
@@ -66,7 +66,54 @@ app.layout = html.Div(children=[
         dcc.Graph(id="bar1", style={"width": "50%", 'display': 'inline-block'}),
         dcc.Graph(id="bar2", style={"width": "50%", 'display': 'inline-block'})
     ]
-    )
+    ),
+    dcc.Checklist(
+        options=[],
+        value=None,
+        id='checklist-regr',
+        inline=True
+    ),
+    html.Button(
+        'Train', 
+        id='start-train',
+        style={
+            "width": "20%",
+            "margin": "auto",
+            "marginTop": "20px",
+            "display": "block"
+        },
+        n_clicks=0
+    ),
+    html.Div(
+        id="r2-output",
+        style={
+            "display": "block",
+            "margin": "auto",
+            "textAlign":"center",
+            "padding": "20px"
+        },
+        children=[]
+    ),
+    html.Div([
+        dcc.Input(
+            id='inputPrediction',
+            placeholder='',
+            type='text',
+            style={
+                "display": "block",
+                "margin": "auto",
+                "width": "50%"
+            }
+        ),
+        html.Button(
+            "Predict",
+            id="start-predict",
+            style={
+                "display": "block",
+                "margin": "auto"
+            }
+        )
+    ])
 ])
 
 @app.callback(
@@ -122,15 +169,31 @@ def updateBar2(contents, filename, target):
     fig.update_layout(xaxis_title="Numerical Variables", yaxis_title=f"Correlation Strength (absolute value)")
     return fig
 
-# @app.callback(
-#     Output('regr', 'figure'),
-#     [Input('upload-data', 'contents'), Input('upload-data', 'filename'), Input('dropdown-target', 'value')]
-# )
-# def regression(filename, contents, targetVar):
-#     df = parseDf(filename, contents)
-#     df = preprocess(df)
-#     gradBoostRegr(df, targetVar)
-    
+@app.callback(
+    [Output('checklist-regr', 'options'), Output('checklist-regr', 'value')],
+    [Input('upload-data', 'contents'), Input('upload-data', 'filename'), Input('dropdown-target', 'value')]
+)
+def setCheckListRegr(contents, filename, targetVar):
+    df = parseDf(filename, contents)
+    df = df.drop(columns=targetVar)
+
+    return df.columns, df.columns
+
+@app.callback(
+    [Output('r2-output', 'children'), Output('inputPrediction', 'placeholder')],
+    [Input('start-train', 'n_clicks')],
+    [State('checklist-regr', 'value'), State('dropdown-target', 'value')]
+)
+def setR2(n_clicks, checklistVal, target):
+    if(n_clicks==0):
+        return [""]
+    r2 = gradBoostRegr(df, target, checklistVal)
+
+    placeholderStr = ""
+    for col in checklistVal:
+        placeholderStr+= col+","
+    placeholderStr = placeholderStr[:-1]
+    return [f"The R2 score is: {r2}"], placeholderStr
 
 if __name__ == '__main__':
     app.run_server(debug=True)
