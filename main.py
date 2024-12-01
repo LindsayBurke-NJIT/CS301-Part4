@@ -212,6 +212,13 @@ def setR2(n_clicks, contents, filename, checklistVal, target):
     placeholderStr = placeholderStr[:-1]
     return [f"The R2 score is: {r2}"], placeholderStr
 
+def isfloat(numStr) -> bool:
+    try:
+        float(numStr)
+        return True
+    except:
+        return False
+
 @app.callback(
     [Output('predict-output', 'children')],
     [Input('start-predict', 'n_clicks')],
@@ -227,6 +234,7 @@ def setPredict(n_clicks, contents, fname, predictVals, target, checklistVals):
         return ["No values entered."]
     else:
         temp = predictVals.replace(",", "")
+        temp = temp.replace(".", "")
         if(not (temp.replace(" ", "")).isalnum()):
             return ["Incorrect character entered in field. Fields must be alphanumeric. Separate fields by \",\""]
         predictVals = predictVals.split(",")
@@ -234,7 +242,7 @@ def setPredict(n_clicks, contents, fname, predictVals, target, checklistVals):
             return [f"Wrong number of values entered. Must be one parameter for each checked off variable. You provided {len(predictVals)}, when {len(checklistVals)} were needed."]
         for idx, col in enumerate(checklistVals):
             if(pd.api.types.is_numeric_dtype(df[col])):
-                if(predictVals[idx].isdigit() == False):
+                if(not predictVals[idx].isdigit() and not isfloat(predictVals[idx])):
                     return [f"Incorrect value entered for {col}. You entered \"{predictVals[idx]}\". Must be a digit."]
                 else:
                     predictVals[idx] = float(predictVals[idx])
