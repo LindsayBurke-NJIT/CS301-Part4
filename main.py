@@ -53,7 +53,9 @@ app.layout = html.Div(children=[
             id='radio-choice',
             inline=True
         ,style={
+            "paddingTop": "20px",
             'width': '50%',
+            "margin": "25wv",
             'display': 'block'
         }
         )
@@ -63,12 +65,21 @@ app.layout = html.Div(children=[
         dcc.Graph(id="bar2", style={"width": "50%", 'display': 'inline-block'})
     ]
     ),
-    dcc.Checklist(
-        options=[],
-        value=None,
-        id='checklist-regr',
-        inline=True
-    ),
+    html.Div(children=[
+        dcc.Checklist(
+            options=[],
+            value=None,
+            id='checklist-regr',
+            inline=True,
+            style={
+                "display": "inline-block",
+                "margin": "auto"
+            }
+        )
+    ],
+    style={
+        "display": "flex"
+    }),
     html.Button(
         'Train', 
         id='start-train',
