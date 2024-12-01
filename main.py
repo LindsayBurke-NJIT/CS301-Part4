@@ -9,6 +9,7 @@ path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
 df = pd.read_csv(path)
 
 app = Dash(__name__)
+server = app.server
 
 app.layout = html.Div(children=[
     dcc.Upload(
