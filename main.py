@@ -28,7 +28,6 @@ app.layout = html.Div(children=[
     ),
     html.Div(children=[
         html.A('Select Target: ', style={
-            'backgroundColor': 'silver',
             'display': 'inline-block',
             'textAlign': 'center',
             'paddingLeft': '500px'
@@ -48,7 +47,7 @@ app.layout = html.Div(children=[
     style={
         'display': 'flex',
         'alignItems': 'center',
-        'backgroundColor': 'silver'
+        'backgroundColor': 'lightGray'
     }),
     html.Div([
         dcc.RadioItems(
@@ -94,14 +93,15 @@ app.layout = html.Div(children=[
         },
         children=[]
     ),
-    html.Div([
+    html.Div(children=[
         dcc.Input(
             id='inputPrediction',
             placeholder='',
             type='text',
             style={
-                "display": "block",
-                "margin": "auto",
+                "display": "inline-block",
+                "marginLeft": "25vw",
+                "marginRight": "0px",
                 "width": "50%"
             }
         ),
@@ -109,11 +109,25 @@ app.layout = html.Div(children=[
             "Predict",
             id="start-predict",
             style={
-                "display": "block",
-                "margin": "auto"
-            }
+                "display": "inline-block",
+                "margin": "0px"
+            },
+            n_clicks=0
         )
-    ])
+    ], style={
+        'display': 'flex',
+        "alignItems": "center"
+    }),
+    html.Div(
+        id="predict-output",
+        style={
+            "display": "block",
+            "margin": "auto",
+            "textAlign":"center",
+            "paddingTop": "20px"
+        },
+        children=[]
+    )
 ])
 
 @app.callback(
@@ -194,6 +208,42 @@ def setR2(n_clicks, checklistVal, target):
         placeholderStr+= col+","
     placeholderStr = placeholderStr[:-1]
     return [f"The R2 score is: {r2}"], placeholderStr
+
+@app.callback(
+    [Output('predict-output', 'children')],
+    [Input('start-predict', 'n_clicks')],
+    [State('upload-data', 'contents'), State('upload-data', 'filename'), State('inputPrediction', 'value'), State('dropdown-target', 'value'),State('checklist-regr', 'value')]
+)
+def setPredict(n_clicks, contents, fname, predictVals, target, checklistVals):
+    if(n_clicks==0):
+        return [""]
+
+    df = parseDf(fname, contents)
+    df = preprocess(df)
+    if(predictVals==""):
+        return ["No values entered."]
+    else:
+        temp = predictVals.replace(",", "")
+        if(not (temp.replace(" ", "")).isalnum()):
+            return ["Incorrect character entered in field. Fields must be alphanumeric. Separate fields by \",\""]
+        predictVals = predictVals.split(",")
+        if not (len(predictVals) == len(checklistVals)):
+            return [f"Wrong number of values entered. Must be one parameter for each checked off variable. You provided {len(predictVals)}, when {len(checklistVals)} were needed."]
+        for idx, col in enumerate(checklistVals):
+            if(pd.api.types.is_numeric_dtype(df[col])):
+                if(predictVals[idx].isdigit() == False):
+                    return [f"Incorrect value entered for {col}. You entered \"{predictVals[idx]}\". Must be a digit."]
+                else:
+                    predictVals[idx] = float(predictVals[idx])
+            else:
+                if(predictVals[idx] not in df[col].unique()):
+                    return [f"Incorrect value entered for {col}. You entered \"{predictVals[idx]}\". Must be one of {df[col].unique()}"]
+        predArr = []
+        predArr.append(predictVals)
+        predictData = pd.DataFrame(predArr, columns=checklistVals)
+    pipe = getPipeline(df[checklistVals], df[target])
+    y_pred = pipe.predict(predictData)
+    return [f"Predicted {target} is: {y_pred}"]
 
 if __name__ == '__main__':
     app.run_server(debug=True)

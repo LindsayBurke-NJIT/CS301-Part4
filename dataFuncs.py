@@ -12,8 +12,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 
 def preprocess(df):
-    df = pd.get_dummies(df,drop_first=True)
-    
     for col in df.select_dtypes(include='object').columns:
         mode_value = df[col].mode()[0]
         df[col].fillna(mode_value, inplace=True)
@@ -36,13 +34,7 @@ def parseDf(filename, contents):
 
     return df
     
-def gradBoostRegr(df, targetVar, checklistVals):
-    if(checklistVals==[]):
-        return None
-    
-    y = df[targetVar]
-    X = df[checklistVals]
-
+def getPipeline(X, y):
     numeric_features = X.select_dtypes(include='number').columns
     categorical_features = X.select_dtypes(include='object').columns
     numeric_transformer = Pipeline(steps=[
@@ -67,12 +59,19 @@ def gradBoostRegr(df, targetVar, checklistVals):
         ('preprocessor', preprocessor),
         ('model', bagging_model)
     ])
-
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
     pipe.fit(X_train, y_train)
-    y_pred = pipe.predict(X_test)
+    return pipe, X_test, y_test
 
+def gradBoostRegr(df, targetVar, checklistVals):
+    if(checklistVals==[]):
+        return None
+    
+    y = df[targetVar]
+    X = df[checklistVals]
+
+    pipe, X_test, y_test = getPipeline(X, y)
+    y_pred = pipe.predict(X_test)
     r2 = r2_score(y_test, y_pred)
 
     return r2
