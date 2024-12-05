@@ -46,20 +46,24 @@ app.layout = html.Div(children=[
         'alignItems': 'center',
         'backgroundColor': 'lightGray'
     }),
-    html.Div([
+    html.Div(children=[
         dcc.RadioItems(
             options=[],
             value=None,
             id='radio-choice',
-            inline=True
-        ,style={
-            "paddingTop": "20px",
-            'width': '50%',
-            "margin": "25wv",
-            'display': 'block'
-        }
+            inline=True,
+            style={
+                    "width": "50%",
+                    "margin": "0 auto",
+                    "padding-top": "20px"
+            }
         )
-    ]),
+    ], 
+    style={
+        "width": "50%", 
+        "margin-left": "0", 
+        "display": "block"
+    }),
     html.Div(children=[
         dcc.Graph(id="bar1", style={"width": "50%", 'display': 'inline-block'}),
         dcc.Graph(id="bar2", style={"width": "50%", 'display': 'inline-block'})
