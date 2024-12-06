@@ -224,7 +224,7 @@ def setR2(n_clicks, contents, filename, checklistVal, target):
     for col in checklistVal:
         placeholderStr+= col+","
     placeholderStr = placeholderStr[:-1]
-    return [f"The R2 score is: {r2}"], placeholderStr
+    return [f"The R2 score is: {round(r2, 2)}"], placeholderStr
 
 def isfloat(numStr) -> bool:
     try:
@@ -268,7 +268,7 @@ def setPredict(n_clicks, contents, fname, predictVals, target, checklistVals):
         predictData = pd.DataFrame(predArr, columns=checklistVals)
     pipe, _, _ = getPipeline(df[checklistVals], df[target])
     y_pred = pipe.predict(predictData)
-    return [f"Predicted {target} is: {y_pred[0]}"]
+    return [f"Predicted {target} is: {round(y_pred[0], 2)}"]
 
 if __name__ == '__main__':
     app.run_server(debug=True)
