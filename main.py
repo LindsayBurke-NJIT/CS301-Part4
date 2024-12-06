@@ -114,7 +114,7 @@ app.layout = html.Div(children=[
                 "display": "inline-block",
                 "marginLeft": "25vw",
                 "marginRight": "0px",
-                "width": "50%"
+                "width": "25%"
             },
             value = ""
         ),
@@ -126,21 +126,20 @@ app.layout = html.Div(children=[
                 "marginLeft": "20px"
             },
             n_clicks=0
+        ),
+        html.Div(
+            id="predict-output",
+            style={
+                "display": "inline-block",
+                "marginLeft": "20px",
+                "textAlign":"center"
+            },
+            children=[]
         )
     ], style={
         'display': 'flex',
         "alignItems": "center"
     }),
-    html.Div(
-        id="predict-output",
-        style={
-            "display": "block",
-            "margin": "auto",
-            "textAlign":"center",
-            "paddingTop": "20px"
-        },
-        children=[]
-    )
 ])
 
 @app.callback(
