@@ -123,7 +123,7 @@ app.layout = html.Div(children=[
             id="start-predict",
             style={
                 "display": "inline-block",
-                "margin": "0px"
+                "marginLeft": "20px"
             },
             n_clicks=0
         )
