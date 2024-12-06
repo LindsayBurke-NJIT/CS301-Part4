@@ -178,8 +178,8 @@ def updateBar1(contents, filename, target, choice):
 
     res = df.groupby(choice)[target].mean().reset_index()
 
-    fig = px.bar(res, x=choice, y=target, title=f"Average {target} by {choice}", text=res.round(6))
-    fig.update_layout(yaxis_title=f"{target} (average)")
+    fig = px.bar(res, x=choice, y=target, title=f"Average {target} by {choice}", text=target)
+    fig.update_layout(yaxis_title=f"{target} (average)", title_x=0.5)
     return fig
 
 @app.callback(
@@ -195,7 +195,7 @@ def updateBar2(contents, filename, target):
     res = res.drop(target)
 
     fig = px.bar(res, x=res.index, y=res.values, title=f"Correlation Strength of Numerical Variables with {target}", text=res.round(2))
-    fig.update_layout(xaxis_title="Numerical Variables", yaxis_title=f"Correlation Strength (absolute value)")
+    fig.update_layout(xaxis_title="Numerical Variables", yaxis_title=f"Correlation Strength (absolute value)", title_x=0.5)
     return fig
 
 @app.callback(
